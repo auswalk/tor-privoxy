@@ -10,11 +10,13 @@ COPY assets/root/ /
 
 RUN apk --no-cache --update add tor privoxy socat \
     && mv /etc/tor/torrc.sample  /etc/tor/torrc \
-    && echo "forward-socks5 / 0.0.0.0:9050 ." >> /etc/privoxy/config \
+    && echo "forward-socks5 / 10.64.0.1:1080 ." >> /etc/privoxy/config \
+    && echo "forward-socks5t .onion 0.0.0.0:9050 ." >> /etc/privoxy/config \
     && sed -i 's/listen-address\s*127.0.0.1:8118/listen-address 0.0.0.0:8118/g' /etc/privoxy/config \
     && sed -i \
         -e 's/#SOCKSPort 192.168.0.1:9100/SOCKSPort 0.0.0.0:9050/g' \
         -e 's/#ControlPort 9051/ControlPort 9052/g' \
+        -e '$ a ExitNodes {us}' \
         /etc/tor/torrc \
     && rc-update add tor \
     && rc-update add privoxy \
